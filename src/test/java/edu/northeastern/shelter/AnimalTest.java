@@ -13,8 +13,11 @@ import org.junit.jupiter.api.Test;
 /**
  * The specification for {@link Animal}, written as tests.
  *
- * <p>Note {@link #twoIdenticalAnimalsAreDifferentObjects()} at the bottom: it asserts the
- * <em>absence</em> of value equality. That is not an oversight to be fixed — it is this lab's
+ * <p>
+ * Note {@link #twoIdenticalAnimalsAreDifferentObjects()} at the bottom: it
+ * asserts the
+ * <em>absence</em> of value equality. That is not an oversight to be fixed — it
+ * is this lab's
  * boundary, and a later lab moves it.
  */
 @Tag("current")
@@ -37,7 +40,9 @@ class AnimalTest {
 
   @Test
   void theNameIsTrimmed() {
-    assertEquals("Luna", new Animal("  Luna  ", Species.CAT, AgeMonths.of(1), INTAKE).name());
+    assertEquals(
+        "Luna",
+        new Animal("  Luna  ", Species.CAT, AgeMonths.of(1), INTAKE).name());
   }
 
   @Test
@@ -49,35 +54,62 @@ class AnimalTest {
 
   @Test
   void aNullNameIsRefused() {
-    assertThrows(
-        IntakeException.class, () -> new Animal(null, Species.DOG, AgeMonths.of(1), INTAKE));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal(null, Species.DOG, AgeMonths.of(1), INTAKE));
+    assertEquals(
+        "Name cannot be null or blank",
+        e.getMessage(),
+        "Unexpected error message");
   }
 
   @Test
   void anEmptyNameIsRefused() {
-    assertThrows(IntakeException.class, () -> new Animal("", Species.DOG, AgeMonths.of(1), INTAKE));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal("", Species.DOG, AgeMonths.of(1), INTAKE));
+    assertEquals(
+        "Name cannot be null or blank",
+        e.getMessage(),
+        "Unexpected error message");
   }
 
   @Test
   void aNameOfOnlyWhitespaceIsRefused() {
-    assertThrows(
-        IntakeException.class, () -> new Animal("   ", Species.DOG, AgeMonths.of(1), INTAKE));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal("   ", Species.DOG, AgeMonths.of(1), INTAKE));
+    assertEquals(
+        "Name cannot be null or blank",
+        e.getMessage(),
+        "Unexpected error message");
   }
 
   @Test
   void aNullSpeciesIsRefused() {
-    assertThrows(IntakeException.class, () -> new Animal("Rex", null, AgeMonths.of(1), INTAKE));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal("Rex", null, AgeMonths.of(1), INTAKE));
+    assertEquals(
+        "Species cannot be null",
+        e.getMessage(),
+        "Unexpected error message");
   }
 
   @Test
   void aNullAgeIsRefused() {
-    assertThrows(IntakeException.class, () -> new Animal("Rex", Species.DOG, null, INTAKE));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal("Rex", Species.DOG, null, INTAKE));
+    assertEquals("Age cannot be null", e.getMessage());
   }
 
   @Test
   void aNullIntakeDateIsRefused() {
-    assertThrows(
-        IntakeException.class, () -> new Animal("Rex", Species.DOG, AgeMonths.of(1), null));
+    IntakeException e = assertThrows(
+        IntakeException.class,
+        () -> new Animal("Rex", Species.DOG, AgeMonths.of(1), null));
+    assertEquals("Intake date cannot be null", e.getMessage());
   }
 
   @Test
@@ -99,18 +131,21 @@ class AnimalTest {
 
   @Test
   void twoIdenticalAnimalsAreDifferentObjects() {
-    // Deliberate: Animal has no value equality in this lab, so the default identity comparison
-    // applies. A later lab gives the Animal family a proper equals/hashCode, and this test moves.
+    // Deliberate: Animal has no value equality in this lab, so the default identity
+    // comparison
+    // applies. A later lab gives the Animal family a proper equals/hashCode, and
+    // this test moves.
     assertNotSame(luna(), luna());
     assertEquals(false, luna().equals(luna()));
   }
 
   @Test
   void theRefusalSaysWhichArgumentWasWrong() {
-    // The rubric grades messages that name the problem. "invalid" tells a reader nothing.
-    IntakeException blankName =
-        assertThrows(
-            IntakeException.class, () -> new Animal("  ", Species.DOG, AgeMonths.of(1), INTAKE));
+    // The rubric grades messages that name the problem. "invalid" tells a reader
+    // nothing.
+    IntakeException blankName = assertThrows(
+        IntakeException.class,
+        () -> new Animal("  ", Species.DOG, AgeMonths.of(1), INTAKE));
     assertTrue(
         blankName.getMessage().toLowerCase().contains("name"),
         "the message should name the offending argument");
