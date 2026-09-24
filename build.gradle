@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+    id 'checkstyle'
+}
+
+group = 'edu.northeastern'
+version = '1.0-SNAPSHOT'
+
+// This course uses Java 21. See installing-java.md.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Checkstyle 10.x pulls both google-collections and guava, which declare the same
+// capability; resolve it in favor of guava so checkstyle's classpath assembles.
+configurations.checkstyle {
+    resolutionStrategy.capabilitiesResolution.withCapability(
+            'com.google.collections:google-collections') {
+        select('com.google.guava:guava:0')
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform {
+        // Optional: -Ptags=<tag> runs only the tests carrying that JUnit @Tag.
+        if (project.hasProperty('tags')) {
+            includeTags(project.property('tags').split(','))
+        }
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+checkstyle {
+    toolVersion = '10.12.7'
+    configFile = file("${projectDir}/config/checkstyle/checkstyle.xml")
+    ignoreFailures = true
+}
+
+checkstyleMain {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+checkstyleTest {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
