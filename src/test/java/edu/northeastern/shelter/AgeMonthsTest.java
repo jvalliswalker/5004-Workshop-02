@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,11 @@ import org.junit.jupiter.api.Test;
 /**
  * The specification for {@link AgeMonths}, written as tests.
  *
- * <p>These tests ship with the assignment and are part of the spec — read them as the definition of
- * "correct". They do not, however, exhaust it: your own tests are graded too, and there are cases
+ * <p>
+ * These tests ship with the assignment and are part of the spec — read them as
+ * the definition of
+ * "correct". They do not, however, exhaust it: your own tests are graded too,
+ * and there are cases
  * here that are deliberately left for you to think of.
  */
 @Tag("current")
@@ -34,13 +38,47 @@ class AgeMonthsTest {
   }
 
   @Test
+  void positiveMonthsWithinMaximumAreAllowed() {
+
+    for (int months = 1; months < AgeMonths.MAX_MONTHS; months++) {
+      try {
+        assertEquals(months, AgeMonths.of(months).months());
+      } catch (IntakeException e) {
+        fail("AgeMonths.of(" + months + ") should not have thrown an IntakeException");
+      }
+    }
+  }
+
+  @Test
   void negativeMonthsIsRefused() {
     assertThrows(IntakeException.class, () -> AgeMonths.of(-1));
   }
 
   @Test
+  void negativeMonthsErrorMessageExpected() {
+    try {
+      AgeMonths.of(-1).toString();
+      fail("AgeMonths.of(-1) should have thrown an IntakeException");
+    } catch (IntakeException e) {
+      assertEquals("age in months cannot be negative, was -1", e.getMessage());
+    }
+  }
+
+  @Test
   void aboveTheMaximumIsRefused() {
     assertThrows(IntakeException.class, () -> AgeMonths.of(AgeMonths.MAX_MONTHS + 1));
+  }
+
+  @Test
+  void aboveTheMaximumErrorMessage() {
+    try {
+      AgeMonths.of(AgeMonths.MAX_MONTHS + 1).toString();
+      fail("AgeMonths.of(" + AgeMonths.MAX_MONTHS + 1 + ") should have thrown an IntakeException");
+    } catch (IntakeException e) {
+      assertEquals(
+          "age in months cannot exceed " + AgeMonths.MAX_MONTHS + ", was " + (AgeMonths.MAX_MONTHS + 1),
+          e.getMessage());
+    }
   }
 
   @Test
@@ -91,8 +129,7 @@ class AgeMonthsTest {
 
   @Test
   void theRefusalNamesTheOffendingValue() {
-    IntakeException tooOld =
-        assertThrows(IntakeException.class, () -> AgeMonths.of(AgeMonths.MAX_MONTHS + 1));
+    IntakeException tooOld = assertThrows(IntakeException.class, () -> AgeMonths.of(AgeMonths.MAX_MONTHS + 1));
     assertTrue(
         tooOld.getMessage().contains(String.valueOf(AgeMonths.MAX_MONTHS + 1)),
         "the message should name the value that was rejected");
