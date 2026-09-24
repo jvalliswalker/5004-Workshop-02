@@ -7,6 +7,12 @@ plugins {
 group = 'edu.northeastern'
 version = '1.0-SNAPSHOT'
 
+test {
+	testLogging {
+		events "PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR"
+	}
+}
+
 // This course uses Java 21. See installing-java.md.
 java {
     toolchain {
