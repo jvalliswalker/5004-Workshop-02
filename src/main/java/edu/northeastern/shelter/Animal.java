@@ -1,6 +1,7 @@
 package edu.northeastern.shelter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * One animal in the shelter's care, as recorded at intake.
@@ -70,7 +71,7 @@ public class Animal {
    *                         is blank
    */
   public Animal(String name, Species species, AgeMonths age, LocalDate intakeDate) {
-    if (name == null || name.trim().isEmpty()) {
+    if (name == null || this.normalizeWhitespace(name).isEmpty()) {
       throw new IntakeException("Name cannot be null or blank");
     }
     if (species == null) {
@@ -82,7 +83,7 @@ public class Animal {
     if (intakeDate == null) {
       throw new IntakeException("Intake date cannot be null");
     }
-    this.name = name.trim();
+    this.name = this.normalizeWhitespace(name);
     this.species = species;
     this.age = age;
     this.intakeDate = intakeDate;
@@ -94,7 +95,7 @@ public class Animal {
    * @return the name, never {@code null} and never blank
    */
   public String name() {
-    return name;
+    return this.name;
   }
 
   /**
@@ -156,5 +157,9 @@ public class Animal {
   @Override
   public String toString() {
     return String.format("%s (%s, %s, intake %s)", name, species.label(), age, intakeDate);
+  }
+
+  private String normalizeWhitespace(String value) {
+    return value.replaceAll("\\p{Zs}+", " ").trim();
   }
 }
