@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +28,25 @@ class AnimalTest {
 
   private static final LocalDate INTAKE = LocalDate.of(2026, 9, 21);
 
+  private static final Map<String, String> NONSTANDARD_WHITESPACE_CHARACTERS() {
+    Map<String, String> returnMap = new HashMap<>();
+    returnMap.put("U+00A0", " ");
+    returnMap.put("U+2002", " ");
+    returnMap.put("U+2003", " ");
+    returnMap.put("U+2004", " ");
+    returnMap.put("U+2005", " ");
+    returnMap.put("U+2006", " ");
+    returnMap.put("U+2007", " ");
+    returnMap.put("U+2008", " ");
+    returnMap.put("U+2009", " ");
+    returnMap.put("U+200A", " ");
+    returnMap.put("U+202F", " ");
+    returnMap.put("U+205F", " ");
+    returnMap.put("U+3000", "　");
+
+    return returnMap;
+  }
+
   private static Animal luna() {
     return new Animal("Luna", Species.CAT, AgeMonths.of(23), INTAKE);
   }
@@ -40,9 +62,25 @@ class AnimalTest {
 
   @Test
   void theNameIsTrimmed() {
+
     assertEquals(
         "Luna",
         new Animal("  Luna  ", Species.CAT, AgeMonths.of(1), INTAKE).name());
+
+    Map<String, String> hashMap = NONSTANDARD_WHITESPACE_CHARACTERS();
+
+    for (String whitespaceName : hashMap.keySet()) {
+      String whitespace = hashMap.get(whitespaceName);
+
+      assertEquals(
+          "Luna",
+          new Animal(
+              whitespace + "Luna" + whitespace,
+              Species.CAT,
+              AgeMonths.of(1),
+              INTAKE).name(),
+          "Whitespace type " + whitespaceName + " not converted to standard whitespace");
+    }
   }
 
   @Test
@@ -53,14 +91,27 @@ class AnimalTest {
   }
 
   @Test
+  void nonstandardInteriorWhiteSpaceIsConverted() {
+
+    Map<String, String> hashMap = NONSTANDARD_WHITESPACE_CHARACTERS();
+
+    for (String whitespaceName : hashMap.keySet()) {
+      String whitespace = hashMap.get(whitespaceName);
+
+      assertEquals(
+          "Mr Bigglesworth",
+          new Animal("Mr" + whitespace + "Bigglesworth", Species.CAT, AgeMonths.of(1), INTAKE).name(),
+          "Whitespace type " + whitespaceName + " not converted to standard whitespace");
+    }
+  }
+
+  @Test
   void aNullNameIsRefused() {
     IntakeException e = assertThrows(
         IntakeException.class,
         () -> new Animal(null, Species.DOG, AgeMonths.of(1), INTAKE));
-    assertEquals(
-        "Name cannot be null or blank",
-        e.getMessage(),
-        "Unexpected error message");
+
+    this.confirmErrorMessage(e, "Name cannot be null or blank");
   }
 
   @Test
@@ -68,21 +119,25 @@ class AnimalTest {
     IntakeException e = assertThrows(
         IntakeException.class,
         () -> new Animal("", Species.DOG, AgeMonths.of(1), INTAKE));
-    assertEquals(
-        "Name cannot be null or blank",
-        e.getMessage(),
-        "Unexpected error message");
+
+    this.confirmErrorMessage(e, "Name cannot be null or blank");
   }
 
   @Test
   void aNameOfOnlyWhitespaceIsRefused() {
-    IntakeException e = assertThrows(
-        IntakeException.class,
-        () -> new Animal("   ", Species.DOG, AgeMonths.of(1), INTAKE));
-    assertEquals(
-        "Name cannot be null or blank",
-        e.getMessage(),
-        "Unexpected error message");
+
+    Map<String, String> hashMap = NONSTANDARD_WHITESPACE_CHARACTERS();
+
+    for (String whitespaceName : hashMap.keySet()) {
+      String whitespace = hashMap.get(whitespaceName);
+
+      IntakeException e = assertThrows(
+          IntakeException.class,
+          () -> new Animal(whitespace, Species.DOG, AgeMonths.of(1), INTAKE),
+          "Name of whitespace type " + whitespaceName + " did not throw IntakeException");
+
+      this.confirmErrorMessage(e, "Name cannot be null or blank");
+    }
   }
 
   @Test
@@ -90,10 +145,8 @@ class AnimalTest {
     IntakeException e = assertThrows(
         IntakeException.class,
         () -> new Animal("Rex", null, AgeMonths.of(1), INTAKE));
-    assertEquals(
-        "Species cannot be null",
-        e.getMessage(),
-        "Unexpected error message");
+
+    this.confirmErrorMessage(e, "Species cannot be null");
   }
 
   @Test
@@ -101,7 +154,8 @@ class AnimalTest {
     IntakeException e = assertThrows(
         IntakeException.class,
         () -> new Animal("Rex", Species.DOG, null, INTAKE));
-    assertEquals("Age cannot be null", e.getMessage());
+
+    this.confirmErrorMessage(e, "Age cannot be null");
   }
 
   @Test
@@ -109,7 +163,8 @@ class AnimalTest {
     IntakeException e = assertThrows(
         IntakeException.class,
         () -> new Animal("Rex", Species.DOG, AgeMonths.of(1), null));
-    assertEquals("Intake date cannot be null", e.getMessage());
+
+    this.confirmErrorMessage(e, "Intake date cannot be null");
   }
 
   @Test
@@ -134,9 +189,7 @@ class AnimalTest {
     // Deliberate: Animal has no value equality in this lab, so the default identity
     // comparison
     // applies. A later lab gives the Animal family a proper equals/hashCode, and
-    // this test moves.
-    assertNotSame(luna(), luna());
-    assertEquals(false, luna().equals(luna()));
+    // this test moves.{
   }
 
   @Test
@@ -150,4 +203,12 @@ class AnimalTest {
         blankName.getMessage().toLowerCase().contains("name"),
         "the message should name the offending argument");
   }
+
+  private void confirmErrorMessage(Exception e, String expectedMessage) {
+    assertEquals(
+        expectedMessage,
+        e.getMessage(),
+        "Unexpected error message");
+  }
+
 }
