@@ -135,14 +135,15 @@ public final class AgeMonths {
   @Override
   public String toString() {
     int years = years();
-    int months = remainderMonths();
+    int remainingMonths = remainderMonths();
 
     if (years == 0) {
-      return months + (months == 1 ? " month" : " months");
-    } else if (months == 0) {
+      return remainingMonths + (remainingMonths == 1 ? " month" : " months");
+    } else if (remainingMonths == 0) {
       return years + (years == 1 ? " year" : " years");
     } else {
-      return years + (years == 1 ? " year, " : " years, ") + months + (months == 1 ? " month" : " months");
+      return years + (years == 1 ? " year, " : " years, ") + remainingMonths
+          + (remainingMonths == 1 ? " month" : " months");
     }
   }
 }
