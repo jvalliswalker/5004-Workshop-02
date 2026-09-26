@@ -1,6 +1,7 @@
 package edu.northeastern.shelter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ class SpeciesTest {
   @Test
   void toStringIsTheLabel() {
     for (Species s : Species.values()) {
+      assertTrue(s.toString().length() > 0, "Species " + s + " has blank toString() value");
       assertEquals(s.label(), s.toString());
     }
   }

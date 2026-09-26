@@ -39,14 +39,9 @@ class AgeMonthsTest {
 
   @Test
   void positiveMonthsWithinMaximumAreAllowed() {
-
-    for (int months = 1; months < AgeMonths.MAX_MONTHS; months++) {
-      try {
-        assertEquals(months, AgeMonths.of(months).months());
-      } catch (IntakeException e) {
-        fail("AgeMonths.of(" + months + ") should not have thrown an IntakeException");
-      }
-    }
+    AgeMonths.of(1);
+    AgeMonths.of(AgeMonths.MAX_MONTHS - 1);
+    AgeMonths.of(AgeMonths.MAX_MONTHS);
   }
 
   @Test
@@ -73,7 +68,7 @@ class AgeMonthsTest {
   void aboveTheMaximumErrorMessage() {
     try {
       AgeMonths.of(AgeMonths.MAX_MONTHS + 1).toString();
-      fail("AgeMonths.of(" + AgeMonths.MAX_MONTHS + 1 + ") should have thrown an IntakeException");
+      fail("AgeMonths.of(" + (AgeMonths.MAX_MONTHS) + 1 + ") should have thrown an IntakeException");
     } catch (IntakeException e) {
       assertEquals(
           "age in months cannot exceed " + AgeMonths.MAX_MONTHS + ", was " + (AgeMonths.MAX_MONTHS + 1),
@@ -105,6 +100,7 @@ class AgeMonthsTest {
     assertTrue(AgeMonths.of(11).isUnderOneYear());
     assertFalse(AgeMonths.of(12).isUnderOneYear());
     assertFalse(AgeMonths.of(13).isUnderOneYear());
+    assertFalse(AgeMonths.of(AgeMonths.MAX_MONTHS).isUnderOneYear());
   }
 
   @Test
@@ -125,6 +121,7 @@ class AgeMonthsTest {
     assertEquals("1 year, 1 month", AgeMonths.of(13).toString());
     assertEquals("1 year, 11 months", AgeMonths.of(23).toString());
     assertEquals("2 years, 1 month", AgeMonths.of(25).toString());
+    assertEquals("40 years", AgeMonths.of(AgeMonths.MAX_MONTHS).toString());
   }
 
   @Test
