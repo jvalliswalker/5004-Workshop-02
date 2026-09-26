@@ -70,7 +70,7 @@ public final class AgeMonths {
    * @return the age in months, never negative
    */
   public int months() {
-    return months;
+    return this.months;
   }
 
   /**
@@ -83,7 +83,7 @@ public final class AgeMonths {
    * @return the number of complete years, never negative
    */
   public int years() {
-    return Math.floorDiv(months, 12);
+    return Math.floorDiv(this.months, 12);
   }
 
   /**
@@ -95,7 +95,7 @@ public final class AgeMonths {
    * @return a value in the range 0 to 11 inclusive
    */
   public int remainderMonths() {
-    return months % 12;
+    return this.months % 12;
   }
 
   /**
@@ -104,7 +104,7 @@ public final class AgeMonths {
    * @return {@code true} if this age is less than twelve months
    */
   public boolean isUnderOneYear() {
-    return months / 12 < 1;
+    return this.years() < 1;
   }
 
   /**
