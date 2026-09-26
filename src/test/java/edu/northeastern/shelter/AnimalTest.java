@@ -214,5 +214,4 @@ class AnimalTest {
         e.getMessage(),
         "Unexpected error message");
   }
-
 }
