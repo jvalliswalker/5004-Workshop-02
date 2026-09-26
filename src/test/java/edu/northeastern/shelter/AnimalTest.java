@@ -111,7 +111,7 @@ class AnimalTest {
         IntakeException.class,
         () -> new Animal(null, Species.DOG, AgeMonths.of(1), INTAKE));
 
-    this.confirmErrorMessage(e, "Name cannot be null or blank");
+    this.confirmErrorMessage(e, "Name cannot be null");
   }
 
   @Test
@@ -120,7 +120,7 @@ class AnimalTest {
         IntakeException.class,
         () -> new Animal("", Species.DOG, AgeMonths.of(1), INTAKE));
 
-    this.confirmErrorMessage(e, "Name cannot be null or blank");
+    this.confirmErrorMessage(e, "Name cannot be blank or all whitespace characters");
   }
 
   @Test
@@ -136,7 +136,9 @@ class AnimalTest {
           () -> new Animal(whitespace, Species.DOG, AgeMonths.of(1), INTAKE),
           "Name of whitespace type " + whitespaceName + " did not throw IntakeException");
 
-      this.confirmErrorMessage(e, "Name cannot be null or blank");
+      this.confirmErrorMessage(
+          e,
+          "Name cannot be blank or all whitespace characters");
     }
   }
 
@@ -189,7 +191,9 @@ class AnimalTest {
     // Deliberate: Animal has no value equality in this lab, so the default identity
     // comparison
     // applies. A later lab gives the Animal family a proper equals/hashCode, and
-    // this test moves.{
+    // this test moves.
+    assertNotSame(luna(), luna());
+    assertEquals(false, luna().equals(luna()));
   }
 
   @Test

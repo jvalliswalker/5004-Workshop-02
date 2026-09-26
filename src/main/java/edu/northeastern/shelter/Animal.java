@@ -1,7 +1,8 @@
 package edu.northeastern.shelter;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * One animal in the shelter's care, as recorded at intake.
@@ -71,18 +72,8 @@ public class Animal {
    *                         is blank
    */
   public Animal(String name, Species species, AgeMonths age, LocalDate intakeDate) {
-    if (name == null || this.normalizeWhitespace(name).isEmpty()) {
-      throw new IntakeException("Name cannot be null or blank");
-    }
-    if (species == null) {
-      throw new IntakeException("Species cannot be null");
-    }
-    if (age == null) {
-      throw new IntakeException("Age cannot be null");
-    }
-    if (intakeDate == null) {
-      throw new IntakeException("Intake date cannot be null");
-    }
+    this.validateConstructorArguments(name, species, age, intakeDate);
+
     this.name = this.normalizeWhitespace(name);
     this.species = species;
     this.age = age;
@@ -156,7 +147,46 @@ public class Animal {
    */
   @Override
   public String toString() {
-    return String.format("%s (%s, %s, intake %s)", name, species.label(), age, intakeDate);
+    return String.format(
+        "%s (%s, %s, intake %s)",
+        this.name,
+        this.species.label(),
+        this.age,
+        this.intakeDate);
+  }
+
+  private void validateConstructorArguments(
+      String name,
+      Species species,
+      AgeMonths age,
+      LocalDate intakeDate) {
+
+    Map<String, Object> arguments = new HashMap<>();
+    arguments.put("Name", name);
+    arguments.put("Species", species);
+    arguments.put("Age", age);
+    arguments.put("Intake date", intakeDate);
+
+    Map<String, String> invalidArguments = new HashMap<String, String>();
+
+    for (String argumentName : arguments.keySet()) {
+      if (arguments.get(argumentName) == null) {
+        invalidArguments.put(argumentName, argumentName + " cannot be null");
+      }
+    }
+
+    if (name != null && this.normalizeWhitespace(name).isEmpty()) {
+      invalidArguments.put("name", "Name cannot be blank or all whitespace characters");
+    }
+
+    if (invalidArguments.size() > 0) {
+      String multipleArgumentsText = invalidArguments.size() > 1 ? "Invalid arguments found: " : "";
+      String exceptionMessage = String.format(
+          "%s%s",
+          multipleArgumentsText,
+          String.join("; ", invalidArguments.values()));
+      throw new IntakeException(exceptionMessage);
+    }
   }
 
   private String normalizeWhitespace(String value) {
