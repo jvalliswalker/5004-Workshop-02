@@ -72,6 +72,7 @@ public class Animal {
    *                         is blank
    */
   public Animal(String name, Species species, AgeMonths age, LocalDate intakeDate) {
+
     this.validateConstructorArguments(name, species, age, intakeDate);
 
     this.name = this.normalizeWhitespace(name);
